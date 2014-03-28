@@ -1,0 +1,80 @@
+﻿<!DOCTYPE html>
+<html dir="ltr" lang="en" class="nojs">
+<head>
+	<meta charset="utf-8" />
+	<meta http-equiv="X-UA-Compatible" content="IE=Edge" />
+	<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1" />
+
+	<title>CNJS TabSwitcher</title>
+
+	<link rel="stylesheet" href="assets/TabSwitcher.css" />
+
+	<script src="assets/vendor/jquery.min.js"></script>
+	<script src="assets/TabSwitcher.js"></script>
+
+	<script>
+		$(function() {
+			var $el = $('#tabswitcher-example');
+			var exTabSwitcher = new TabSwitcher( $el, {} );
+		});
+    </script>
+
+</head>
+<body>
+
+
+	<div id="tabswitcher-example" class="tabswitcher">
+
+		<nav class="tabnav">
+			<ul>
+				<li><a href="#tabpanel-1">tab 1</a></li>
+				<li><a href="#tabpanel-2">tab 2</a></li>
+				<li><a href="#tabpanel-3">tab 3</a></li>
+				<li><a href="#tabpanel-4">tab 4</a></li>
+			</ul>
+		</nav>
+
+		<section class="tabpanels">
+			<article id="tabpanel-1" class="panel">
+
+				<h2>Panel One</h2>
+
+				<p>
+					Tab One content. Lorem ipsum dolor sit amet, consectetuer adipiscing elit. Cras vitae ante. Cras accumsan augue sit amet velit. Morbi ac enim at libero sollicitudin varius. Vivamus dignissim sagittis lectus.
+				</p>
+
+			</article>
+			<article id="tabpanel-2" class="panel">
+
+				<h2>Panel Two</h2>
+
+				<p>
+					Tab Two content. Lorem ipsum dolor sit amet, consectetuer adipiscing elit. Cras vitae ante. Cras accumsan augue sit amet velit. Morbi ac enim at libero sollicitudin varius. Vivamus dignissim sagittis lectus.
+				</p>
+
+			</article>
+			<article id="tabpanel-3" class="panel">
+
+				<h2>Panel Three</h2>
+
+				<p>
+					Tab Three content. Lorem ipsum dolor sit amet, consectetuer adipiscing elit. Cras vitae ante. Cras accumsan augue sit amet velit. Morbi ac enim at libero sollicitudin varius. Vivamus dignissim sagittis lectus.
+				</p>
+
+			</article>
+			<article id="tabpanel-4" class="panel">
+
+				<h2>Panel Four</h2>
+
+				<p>
+					Tab Four content. Lorem ipsum dolor sit amet, consectetuer adipiscing elit. Cras vitae ante. Cras accumsan augue sit amet velit. Morbi ac enim at libero sollicitudin varius. Vivamus dignissim sagittis lectus.
+				</p>
+
+			</article>
+		</section>
+
+	</div>
+
+
+</body>
+</html>

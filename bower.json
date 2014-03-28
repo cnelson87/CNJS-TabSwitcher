@@ -1,0 +1,20 @@
+{
+	"name": "CNJS-TabSwitcher",
+	"description": "TabSwitcher widget and/or browserify module",
+	"version": "0.1.0",
+	"main": [
+		"assets/TabSwitcher.js",
+		"assets/TabSwitcher.css"
+	],
+	"authors": [
+		"Chris Nelson <cnelson87@gmail.com>"
+	],
+	"repository": {
+		"type": "git",
+		"url": "https://github.com/cnelson87/CNJS-TabSwitcher"
+	},
+	"dependencies": {
+		"jquery": "~2.1.0"
+	},
+	"private": true
+}
