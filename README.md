@@ -2,4 +2,4 @@
 
 TabSwitcher widget and/or browserify module
 
-Registration: `bower register CNJS-TabSwitcher git://github.com/cnelson87/CNJS-TabSwitcher-TEST.git`
+Registration: `bower register CNJS-TabSwitcher-NEW git://github.com/cnelson87/CNJS-TabSwitcher.git`
