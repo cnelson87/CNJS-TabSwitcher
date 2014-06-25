@@ -4,45 +4,45 @@
 
 
 .tabswitcher {
-	/* arbitrary width */
-	width: 600px;
-	border: 1px solid #000;
+	width: 100%;
+	margin-bottom: 1em;
+	position: relative;
 }
 
-.tabswitcher .tabnav {
-	margin-bottom: 1em;
-}
-	.tabswitcher .tabnav ul {
-		list-style: none;
-		margin: 0;
-		padding: 0;
+	.tabswitcher .tabnav {
+		margin-bottom: 1em;
+		position: relative;
 	}
-	.tabswitcher .tabnav ul li {
-		display: inline-block;
-		margin: 0;
-		padding: 0;
-	}
-	.tabswitcher .tabnav ul li a {
-		color: #000;
-		text-decoration: none;
-		display: inline-block;
-		background-color: #ccc;
-		padding: 0.5em 1em;
-	}
-	.tabswitcher .tabnav ul li a:hover,
-	.tabswitcher .tabnav ul li a:focus,
-	.tabswitcher .tabnav ul li a.active {
-		color: #fff;
-		background-color: #333;
-	}
+		.tabswitcher .tabnav > ul {
+			list-style: none;
+		}
+		.tabswitcher .tabnav > ul > li {
+			display: inline-block;
+		}
+		.tabswitcher .tabnav > ul > li > a {
+			display: block;
+			color: #010101;
+			text-align: center;
+			text-decoration: none;			
+			background: #ccc;
+			padding: 0.5em 1em;
+		}
+		.tabswitcher .tabnav > ul > li > a.active {
+			color: #fff;
+			background: #333;
+		}
+		.tabswitcher .tabnav > ul > li > a:hover,
+		.tabswitcher .tabnav > ul > li > a:focus {
+			color: #fff;
+			background: #666;
+		}
 
-.tabswitcher .tabpanels {
-	margin-bottom: 1em;
-}
-	.tabswitcher .tabpanels article {
-		padding: 1em;
-	}
-	.tabswitcher .tabpanels article:focus {
-		/* note: focus style is meant merely for demo purpose */
-		background: #efefef;
-	}
+	.tabswitcher .tabpanels {}
+		.tabswitcher .tabpanels > article {
+			padding: 1em;
+			position: relative;
+		}
+		.tabswitcher .tabpanels > article:focus {
+			/* note: focus style is meant merely for demo purpose (is not necessary to meet accessibility reqs) */
+			background: #efefef;
+		}
