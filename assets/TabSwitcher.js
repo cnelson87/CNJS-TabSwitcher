@@ -36,16 +36,16 @@ var TabSwitcher = function ($el, objOptions) {
 	this.$elPanels = this.$el.find(this.options.selectorPanels);
 
 	// setup & properties
-	this._isInitialized = false;
-	this._isAnimating = false;
+	this.isInitialized = false;
+	this.isAnimating = false;
 	this._len = this.$elPanels.length;
 	if (this.options.initialIndex >= this._len) {this.options.initialIndex = 0;}
 	this.currentIndex = this.options.initialIndex;
 	this.prevIndex = false;
 
-	this._initialize();
+	this.initialize();
 
-    this._bindEvents();
+    this.bindEvents();
 
 };
 
@@ -55,11 +55,9 @@ TabSwitcher.prototype = {
 *	Private Methods
 **/
 
-	_initialize: function() {
-		var self = this;
-		var index = this.currentIndex;
-		var $elActiveTab = $(this.$elTabs[index]);
-		var $elActivePanel = $(this.$elPanels[index]);
+	initialize: function() {
+		var $elActiveTab = $(this.$elTabs[this.currentIndex]);
+		var $elActivePanel = $(this.$elPanels[this.currentIndex]);
 
 		this.$elTabs.attr({'role':'tab'});
 		this.$elPanels.attr({'role':'tabpanel', 'tabindex':'-1'}).hide();
@@ -69,17 +67,18 @@ TabSwitcher.prototype = {
 
 		$.event.trigger(this.options.customEventPrfx + ':isInitialized', [this.elContainer]);
 
-		this._isInitialized = true;
+		this.isInitialized = true;
 
 	},
 
-	_bindEvents: function() {
-		var self = this;
+	bindEvents: function() {
 
 		this.$elTabs.on('click', function(e) {
 			e.preventDefault();
-			if (!self._isAnimating) {self.__clickTab(e);}
-		});
+			if (!this.isAnimating) {
+				this.__clickTab(e);
+			}
+		}.bind(this));
 
 	},
 
@@ -96,7 +95,7 @@ TabSwitcher.prototype = {
 		} else {
 			this.prevIndex = this.currentIndex;
 			this.currentIndex = index;
-			this.switchPanels();
+			this.switchPanel();
 		}
 
 	},
@@ -106,14 +105,13 @@ TabSwitcher.prototype = {
 *	Public Methods
 **/
 
-	switchPanels: function() {
-		var self = this;
+	switchPanel: function() {
 		var $elInactiveTab = $(this.$elTabs[this.prevIndex]);
 		var $elInactivePanel = $(this.$elPanels[this.prevIndex]);
 		var $elActiveTab = $(this.$elTabs[this.currentIndex]);
 		var $elActivePanel = $(this.$elPanels[this.currentIndex]);
 
-		this._isAnimating = true;
+		this.isAnimating = true;
 
 		//update tabs
 		$elInactiveTab.removeClass(this.options.activeClass);
@@ -122,9 +120,9 @@ TabSwitcher.prototype = {
 		//update panels
 		$elInactivePanel.removeClass(this.options.activeClass).hide();
 		$elActivePanel.addClass(this.options.activeClass).fadeIn(this.options.animDuration, this.options.animEasing, function() {
+			this.isAnimating = false;
 			$elActivePanel.focus();
-			self._isAnimating = false;
-		});
+		}.bind(this));
 
 		$.event.trigger(this.options.customEventPrfx + ':panelSwitched', [this.currentIndex]);
 
