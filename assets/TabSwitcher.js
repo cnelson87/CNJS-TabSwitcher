@@ -13,61 +13,80 @@
 
 	DEPENDENCIES:
 		- jQuery 1.10+
+		- jQuery.easing
+		- Class.js
 
 */
 
-var TabSwitcher = function ($el, objOptions) {
-	var self = this;
+var TabSwitcher = Class.extend({
+	init: function($el, objOptions) {
 
-	// defaults
-	this.$el = $el;
-	this.options = $.extend({
-		initialIndex: 0,
-		selectorTabs: '.tabnav a',
-		selectorPanels: '.tabpanels article',
-		activeClass: 'active',
-		animDuration: 400,
-		animEasing: 'swing',
-		customEventPrfx: 'CNJS:TabSwitcher'
-    }, objOptions || {});
+		// defaults
+		this.$el = $el;
+		this.options = $.extend({
+			initialIndex: 0,
+			selectorTabs: '.tabnav a',
+			selectorPanels: '.tabpanels article',
+			activeClass: 'active',
+			animDuration: 400,
+			animEasing: 'easeInQuad',
+			customEventPrfx: 'CNJS:TabSwitcher'
+		}, objOptions || {});
 
-	// element references
-	this.$elTabs = this.$el.find(this.options.selectorTabs);
-	this.$elPanels = this.$el.find(this.options.selectorPanels);
+		// element references
+		this.$elTabs = this.$el.find(this.options.selectorTabs);
+		this.$elPanels = this.$el.find(this.options.selectorPanels);
 
-	// setup & properties
-	this.isInitialized = false;
-	this.isAnimating = false;
-	this._len = this.$elPanels.length;
-	if (this.options.initialIndex >= this._len) {this.options.initialIndex = 0;}
-	this.currentIndex = this.options.initialIndex;
-	this.prevIndex = false;
+		// setup & properties
+		this.isAnimating = false;
+		this._len = this.$elPanels.length;
+		if (this.options.initialIndex >= this._len) {this.options.initialIndex = 0;}
+		this.currentIndex = this.options.initialIndex;
+		this.prevIndex = false;
 
-	this.initialize();
+		// check url hash to override currentIndex
+		this.focusOnInit = false;
+		this.urlHash = window.location.hash.replace('#','') || false;
+		if (this.urlHash) {
+			for (var i=0; i<this._len; i++) {
+				if (this.$elPanels[i].id === this.urlHash) {
+					this.currentIndex = i;
+					this.focusOnInit = true;
+					break;
+				}
+			}
+		}
 
-    this.bindEvents();
+		this.initDOM();
 
-};
+		this.bindEvents();
 
-TabSwitcher.prototype = {
+		$.event.trigger(this.options.customEventPrfx + ':isInitialized', [this.$el]);
+
+	},
+
 
 /**
 *	Private Methods
 **/
 
-	initialize: function() {
+	initDOM: function() {
 		var $elActiveTab = $(this.$elTabs[this.currentIndex]);
 		var $elActivePanel = $(this.$elPanels[this.currentIndex]);
 
+		this.$el.attr({'role':'tablist'});
 		this.$elTabs.attr({'role':'tab'});
 		this.$elPanels.attr({'role':'tabpanel', 'tabindex':'-1'}).hide();
 
 		$elActiveTab.addClass(this.options.activeClass);
 		$elActivePanel.addClass(this.options.activeClass).show();
 
-		$.event.trigger(this.options.customEventPrfx + ':isInitialized', [this.elContainer]);
-
-		this.isInitialized = true;
+		if (this.focusOnInit) {
+			$(window).load(function() {
+				$('html, body').animate({scrollTop:0}, 1);
+				$elActivePanel.focus();
+			});
+		}
 
 	},
 
@@ -128,7 +147,7 @@ TabSwitcher.prototype = {
 
 	}
 
-};
+});
 
 
 //uncomment to use as a browserify module

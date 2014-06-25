@@ -43,6 +43,6 @@
 		padding: 1em;
 	}
 	.tabswitcher .tabpanels article:focus {
-		/* note: focus style for demo purposes only */
+		/* note: focus style is meant merely for demo purpose */
 		background: #efefef;
 	}
