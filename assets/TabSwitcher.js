@@ -28,6 +28,7 @@ var TabSwitcher = Class.extend({
 			selectorTabs: '.tabnav a',
 			selectorPanels: '.tabpanels article',
 			activeClass: 'active',
+			equalizeHeight: true,
 			animDuration: 400,
 			animEasing: 'easeInQuad',
 			customEventPrfx: 'CNJS:TabSwitcher'
