@@ -24,7 +24,7 @@
 			color: #010101;
 			text-align: center;
 			text-decoration: none;			
-			background: #ccc;
+			background: #dcdcdc;
 			padding: 0.5em 1em;
 		}
 		.tabswitcher .tabnav > ul > li > a.active {
@@ -34,7 +34,7 @@
 		.tabswitcher .tabnav > ul > li > a:hover,
 		.tabswitcher .tabnav > ul > li > a:focus {
 			color: #fff;
-			background: #666;
+			background: #787878;
 		}
 
 	.tabswitcher .tabpanels {}

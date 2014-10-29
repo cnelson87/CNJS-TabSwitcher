@@ -13,7 +13,7 @@
 
 	DEPENDENCIES:
 		- jQuery 1.10+
-		- jQuery.easing
+		- greensock
 		- Class.js
 
 */
@@ -29,8 +29,8 @@ var TabSwitcher = Class.extend({
 			selectorPanels: '.tabpanels article',
 			activeClass: 'active',
 			equalizeHeight: true,
-			animDuration: 400,
-			animEasing: 'easeInQuad',
+			animDuration: 0.2,
+			animEasing: 'Power4.easeIn',
 			customEventPrfx: 'CNJS:TabSwitcher'
 		}, objOptions || {});
 
@@ -77,10 +77,20 @@ var TabSwitcher = Class.extend({
 
 		this.$el.attr({'role':'tablist'});
 		this.$elTabs.attr({'role':'tab'});
-		this.$elPanels.attr({'role':'tabpanel', 'tabindex':'-1'}).hide();
+		this.$elPanels.attr({'role':'tabpanel', 'tabindex':'-1'});
 
 		$elActiveTab.addClass(this.options.activeClass);
-		$elActivePanel.addClass(this.options.activeClass).show();
+		$elActivePanel.addClass(this.options.activeClass);
+
+		TweenMax.set(this.$elPanels, {
+			display: 'none',
+			opacity: 0
+		});
+
+		TweenMax.set($elActivePanel, {
+			display: 'block',
+			opacity: 1
+		});
 
 		if (this.focusOnInit) {
 			$(window).load(function() {
@@ -93,10 +103,10 @@ var TabSwitcher = Class.extend({
 
 	bindEvents: function() {
 
-		this.$elTabs.on('click', function(e) {
-			e.preventDefault();
+		this.$elTabs.on('click', function(event) {
+			event.preventDefault();
 			if (!this.isAnimating) {
-				this.__clickTab(e);
+				this.__clickTab(event);
 			}
 		}.bind(this));
 
@@ -107,8 +117,8 @@ var TabSwitcher = Class.extend({
 *	Event Handlers
 **/
 
-	__clickTab: function(e) {
-		var index = this.$elTabs.index(e.currentTarget);
+	__clickTab: function(event) {
+		var index = this.$elTabs.index(event.currentTarget);
 
 		if (this.currentIndex === index) {
 			this.$elPanels[index].focus();
@@ -126,6 +136,7 @@ var TabSwitcher = Class.extend({
 **/
 
 	switchPanel: function() {
+		var self = this;
 		var $elInactiveTab = $(this.$elTabs[this.prevIndex]);
 		var $elInactivePanel = $(this.$elPanels[this.prevIndex]);
 		var $elActiveTab = $(this.$elTabs[this.currentIndex]);
@@ -138,11 +149,23 @@ var TabSwitcher = Class.extend({
 		$elActiveTab.addClass(this.options.activeClass);
 
 		//update panels
-		$elInactivePanel.removeClass(this.options.activeClass).hide();
-		$elActivePanel.addClass(this.options.activeClass).fadeIn(this.options.animDuration, this.options.animEasing, function() {
-			this.isAnimating = false;
-			$elActivePanel.focus();
-		}.bind(this));
+		$elInactivePanel.removeClass(this.options.activeClass);
+		$elActivePanel.addClass(this.options.activeClass);
+
+		TweenMax.set($elInactivePanel, {
+			display: 'none',
+			opacity: 0
+		});
+
+		TweenMax.to($elActivePanel, this.options.animDuration, {
+			display: 'block',
+			opacity: 1,
+			ease: self.options.animEasing,
+			onComplete: function() {
+				self.isAnimating = false;
+				$elActivePanel.focus();
+			}
+		});
 
 		$.event.trigger(this.options.customEventPrfx + ':panelSwitched', [this.currentIndex]);
 
