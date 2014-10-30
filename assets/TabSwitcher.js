@@ -22,6 +22,7 @@ var TabSwitcher = Class.extend({
 	init: function($el, objOptions) {
 
 		// defaults
+		this.$window = $(window);
 		this.$el = $el;
 		this.options = $.extend({
 			initialIndex: 0,
@@ -44,6 +45,7 @@ var TabSwitcher = Class.extend({
 		if (this.options.initialIndex >= this._len) {this.options.initialIndex = 0;}
 		this.currentIndex = this.options.initialIndex;
 		this.prevIndex = false;
+		this.heightEqualizer = null;
 
 		// check url hash to override currentIndex
 		this.focusOnInit = false;
@@ -79,6 +81,11 @@ var TabSwitcher = Class.extend({
 		this.$elTabs.attr({'role':'tab'});
 		this.$elPanels.attr({'role':'tabpanel', 'tabindex':'-1'});
 
+		// equalize items height
+		if (this.options.equalizeHeight) {
+			this.heightEqualizer = new HeightEqualizer(this.$elPanels);
+		}
+
 		$elActiveTab.addClass(this.options.activeClass);
 		$elActivePanel.addClass(this.options.activeClass);
 
@@ -110,12 +117,22 @@ var TabSwitcher = Class.extend({
 			}
 		}.bind(this));
 
+		this.$window.on('resize', function(event) {
+			this.__onWindowResize(event);
+		}.bind(this));
+
 	},
 
 
 /**
 *	Event Handlers
 **/
+
+	__onWindowResize: function(event) {
+		if (this.options.equalizeHeight) {
+			this.heightEqualizer.resetHeight();
+		}
+	},
 
 	__clickTab: function(event) {
 		var index = this.$elTabs.index(event.currentTarget);

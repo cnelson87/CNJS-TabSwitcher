@@ -44,5 +44,5 @@
 		}
 		.tabswitcher .tabpanels > article:focus {
 			/* note: focus style is meant merely for demo purpose (is not necessary to meet accessibility reqs) */
-			background: #efefef;
+			background: #f9f9f9;
 		}
