@@ -27,9 +27,12 @@ var TabSwitcher = Class.extend({
 		this.options = $.extend({
 			initialIndex: 0,
 			selectorTabs: '.tabnav a',
-			selectorPanels: '.tabpanels article',
+			selectorPanels: '.tabpanels > article',
 			activeClass: 'active',
-			equalizeHeight: true,
+			equalizeHeight: false,
+			autoRotate: false,
+			autoRotateInterval: 6000,
+			maxAutoRotations: 5,
 			animDuration: 0.2,
 			animEasing: 'Power4.easeIn',
 			customEventPrfx: 'CNJS:TabSwitcher'
@@ -99,6 +102,16 @@ var TabSwitcher = Class.extend({
 			opacity: 1
 		});
 
+		// auto-rotate items
+		if (this.options.autoRotate) {
+			this.rotationInterval = this.options.autoRotateInterval;
+			this.autoRotationCounter = this._len * this.options.maxAutoRotations;
+			this.setAutoRotation = setInterval(function() {
+				this.autoRotation();
+			}.bind(this), this.rotationInterval);
+		}
+
+		// focus on initial content
 		if (this.focusOnInit) {
 			$(window).load(function() {
 				$('html, body').animate({scrollTop:0}, 1);
@@ -123,6 +136,21 @@ var TabSwitcher = Class.extend({
 
 	},
 
+	autoRotation: function() {
+		this.prevIndex = this.currentIndex;
+		this.currentIndex++;
+		if (this.currentIndex === this._len) {this.currentIndex = 0;}
+
+		this.switchPanels();
+		this.autoRotationCounter--;
+
+		if (this.autoRotationCounter === 0) {
+			clearInterval(this.setAutoRotation);
+			this.options.autoRotate = false;
+		}
+
+	},
+
 
 /**
 *	Event Handlers
@@ -137,12 +165,17 @@ var TabSwitcher = Class.extend({
 	__clickTab: function(event) {
 		var index = this.$elTabs.index(event.currentTarget);
 
+		if (this.options.autoRotate) {
+			clearInterval(this.setAutoRotation);
+			this.options.autoRotate = false;
+		}
+
 		if (this.currentIndex === index) {
 			this.$elPanels[index].focus();
 		} else {
 			this.prevIndex = this.currentIndex;
 			this.currentIndex = index;
-			this.switchPanel();
+			this.switchPanels(event);
 		}
 
 	},
@@ -152,7 +185,7 @@ var TabSwitcher = Class.extend({
 *	Public Methods
 **/
 
-	switchPanel: function() {
+	switchPanels: function(event) {
 		var self = this;
 		var $elInactiveTab = $(this.$elTabs[this.prevIndex]);
 		var $elInactivePanel = $(this.$elPanels[this.prevIndex]);
@@ -180,7 +213,7 @@ var TabSwitcher = Class.extend({
 			ease: self.options.animEasing,
 			onComplete: function() {
 				self.isAnimating = false;
-				$elActivePanel.focus();
+				if (!!event) {$elActivePanel.focus();}
 			}
 		});
 
