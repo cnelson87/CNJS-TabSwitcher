@@ -1,5 +1,5 @@
 # CNJS-TabSwitcher
 
-TabSwitcher widget and/or browserify module
+Basic TabSwitcher widget
 
 Registration: `bower register CNJS-TabSwitcher git://github.com/cnelson87/CNJS-TabSwitcher.git`

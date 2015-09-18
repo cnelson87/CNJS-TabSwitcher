@@ -1,18 +1,18 @@
 /*
 	TITLE: TabSwitcher
 
-	DESCRIPTION: standard tab switcher
+	DESCRIPTION: Basic TabSwitcher widget
 
-	VERSION: 0.1.0
+	VERSION: 0.2.0
 
-	USAGE: var myTabSwitcher = new TabSwitcher($('#el'), {options});
+	USAGE: var myTabSwitcher = new TabSwitcher('Element', 'Options')
 		@param {jQuery Object}
 		@param {Object}
 
-	AUTHORS: CN
+	AUTHOR: CN
 
 	DEPENDENCIES:
-		- jQuery 1.10+
+		- jQuery 2.1.4+
 		- greensock
 		- Class.js
 
@@ -222,7 +222,6 @@ var TabSwitcher = Class.extend({
 	}
 
 });
-
 
 //uncomment to use as a browserify module
 //module.exports = TabSwitcher;
