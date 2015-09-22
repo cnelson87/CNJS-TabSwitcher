@@ -3,7 +3,7 @@
 
 	DESCRIPTION: Basic TabSwitcher widget
 
-	VERSION: 0.2.0
+	VERSION: 0.2.2
 
 	USAGE: var myTabSwitcher = new TabSwitcher('Element', 'Options')
 		@param {jQuery Object}
@@ -15,6 +15,7 @@
 		- jQuery 2.1.4+
 		- greensock
 		- Class.js
+		- HeightEqualizer.js
 
 */
 
@@ -23,11 +24,12 @@ var TabSwitcher = Class.extend({
 
 		// defaults
 		this.$window = $(window);
+		this.$htmlBody = $('html, body');
 		this.$el = $el;
 		this.options = $.extend({
 			initialIndex: 0,
 			selectorTabs: '.tabnav a',
-			selectorPanels: '.tabpanels > article',
+			selectorPanels: '.tab-panel',
 			activeClass: 'active',
 			equalizeHeight: false,
 			autoRotate: false,
@@ -39,12 +41,12 @@ var TabSwitcher = Class.extend({
 		}, objOptions || {});
 
 		// element references
-		this.$elTabs = this.$el.find(this.options.selectorTabs);
-		this.$elPanels = this.$el.find(this.options.selectorPanels);
+		this.$tabs = this.$el.find(this.options.selectorTabs);
+		this.$panels = this.$el.find(this.options.selectorPanels);
 
 		// setup & properties
 		this.isAnimating = false;
-		this._len = this.$elPanels.length;
+		this._len = this.$panels.length;
 		if (this.options.initialIndex >= this._len) {this.options.initialIndex = 0;}
 		this.currentIndex = this.options.initialIndex;
 		this.prevIndex = false;
@@ -55,7 +57,7 @@ var TabSwitcher = Class.extend({
 		this.urlHash = window.location.hash.replace('#','') || false;
 		if (this.urlHash) {
 			for (var i=0; i<this._len; i++) {
-				if (this.$elPanels[i].id === this.urlHash) {
+				if (this.$panels[i].id === this.urlHash) {
 					this.currentIndex = i;
 					this.focusOnInit = true;
 					break;
@@ -67,8 +69,6 @@ var TabSwitcher = Class.extend({
 
 		this.bindEvents();
 
-		$.event.trigger(this.options.customEventPrfx + ':isInitialized', [this.$el]);
-
 	},
 
 
@@ -77,27 +77,30 @@ var TabSwitcher = Class.extend({
 **/
 
 	initDOM: function() {
-		var $elActiveTab = $(this.$elTabs[this.currentIndex]);
-		var $elActivePanel = $(this.$elPanels[this.currentIndex]);
+		var $activeTab = $(this.$tabs[this.currentIndex]);
+		var $activePanel = $(this.$panels[this.currentIndex]);
 
 		this.$el.attr({'role':'tablist'});
-		this.$elTabs.attr({'role':'tab'});
-		this.$elPanels.attr({'role':'tabpanel', 'tabindex':'-1'});
+		this.$tabs.attr({'role':'tab'});
+		this.$panels.attr({'role':'tabpanel', 'tabindex':'-1'});
 
 		// equalize items height
 		if (this.options.equalizeHeight) {
-			this.heightEqualizer = new HeightEqualizer(this.$elPanels);
+			this.heightEqualizer = new HeightEqualizer( this.$el, {
+				selectorItems: this.options.selectorPanels,
+				setParentHeight: false
+			});
 		}
 
-		$elActiveTab.addClass(this.options.activeClass);
-		$elActivePanel.addClass(this.options.activeClass);
+		$activeTab.addClass(this.options.activeClass);
+		$activePanel.addClass(this.options.activeClass);
 
-		TweenMax.set(this.$elPanels, {
+		TweenMax.set(this.$panels, {
 			display: 'none',
 			opacity: 0
 		});
 
-		TweenMax.set($elActivePanel, {
+		TweenMax.set($activePanel, {
 			display: 'block',
 			opacity: 1
 		});
@@ -111,19 +114,21 @@ var TabSwitcher = Class.extend({
 			}.bind(this), this.rotationInterval);
 		}
 
-		// focus on initial content
+		// initial focus on content
 		if (this.focusOnInit) {
 			$(window).load(function() {
-				$('html, body').animate({scrollTop:0}, 1);
-				$elActivePanel.focus();
-			});
+				this.$htmlBody.animate({scrollTop: 0}, 1);
+				this.focusOnPanel($activePanel);
+			}.bind(this));
 		}
+
+		$.event.trigger(this.options.customEventPrfx + ':isInitialized', [this.$el]);
 
 	},
 
 	bindEvents: function() {
 
-		this.$elTabs.on('click', function(event) {
+		this.$tabs.on('click', function(event) {
 			event.preventDefault();
 			if (!this.isAnimating) {
 				this.__clickTab(event);
@@ -163,7 +168,7 @@ var TabSwitcher = Class.extend({
 	},
 
 	__clickTab: function(event) {
-		var index = this.$elTabs.index(event.currentTarget);
+		var index = this.$tabs.index(event.currentTarget);
 
 		if (this.options.autoRotate) {
 			clearInterval(this.setAutoRotation);
@@ -171,7 +176,7 @@ var TabSwitcher = Class.extend({
 		}
 
 		if (this.currentIndex === index) {
-			this.$elPanels[index].focus();
+			this.$panels[index].focus();
 		} else {
 			this.prevIndex = this.currentIndex;
 			this.currentIndex = index;
@@ -187,38 +192,48 @@ var TabSwitcher = Class.extend({
 
 	switchPanels: function(event) {
 		var self = this;
-		var $elInactiveTab = $(this.$elTabs[this.prevIndex]);
-		var $elInactivePanel = $(this.$elPanels[this.prevIndex]);
-		var $elActiveTab = $(this.$elTabs[this.currentIndex]);
-		var $elActivePanel = $(this.$elPanels[this.currentIndex]);
+		var $inactiveTab = $(this.$tabs[this.prevIndex]);
+		var $inactivePanel = $(this.$panels[this.prevIndex]);
+		var $activeTab = $(this.$tabs[this.currentIndex]);
+		var $activePanel = $(this.$panels[this.currentIndex]);
 
 		this.isAnimating = true;
 
 		//update tabs
-		$elInactiveTab.removeClass(this.options.activeClass);
-		$elActiveTab.addClass(this.options.activeClass);
+		$inactiveTab.removeClass(this.options.activeClass);
+		$activeTab.addClass(this.options.activeClass);
 
 		//update panels
-		$elInactivePanel.removeClass(this.options.activeClass);
-		$elActivePanel.addClass(this.options.activeClass);
+		$inactivePanel.removeClass(this.options.activeClass);
+		$activePanel.addClass(this.options.activeClass);
 
-		TweenMax.set($elInactivePanel, {
+		TweenMax.set($inactivePanel, {
 			display: 'none',
 			opacity: 0
 		});
 
-		TweenMax.to($elActivePanel, this.options.animDuration, {
+		TweenMax.to($activePanel, this.options.animDuration, {
 			display: 'block',
 			opacity: 1,
 			ease: self.options.animEasing,
 			onComplete: function() {
 				self.isAnimating = false;
-				if (!!event) {$elActivePanel.focus();}
+				if (!!event) {
+					$activePanel.focus();
+					self.focusOnPanel($activePanel);
+				}
 			}
 		});
 
-		$.event.trigger(this.options.customEventPrfx + ':panelSwitched', [this.currentIndex]);
+		$.event.trigger(this.options.customEventPrfx + ':panelOpened', [this.currentIndex]);
 
+	},
+
+	focusOnPanel: function($panel) {
+		var scrollYPos = $panel.offset().top;
+		this.$htmlBody.animate({scrollTop: scrollYPos}, 200, function(){
+			$panel.focus();
+		});
 	}
 
 });
