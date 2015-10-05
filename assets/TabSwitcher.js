@@ -3,7 +3,7 @@
 
 	DESCRIPTION: Basic TabSwitcher widget
 
-	VERSION: 0.2.2
+	VERSION: 0.2.3
 
 	USAGE: var myTabSwitcher = new TabSwitcher('Element', 'Options')
 		@param {jQuery Object}
@@ -231,9 +231,15 @@ var TabSwitcher = Class.extend({
 
 	focusOnPanel: function($panel) {
 		var scrollYPos = $panel.offset().top;
-		this.$htmlBody.animate({scrollTop: scrollYPos}, 200, function(){
+		var pnlHeight = $panel.outerHeight();
+		var winHeight = this.$window.height();
+		if (pnlHeight > winHeight) {
+			this.$htmlBody.animate({scrollTop: scrollYPos}, 200, function(){
+				$panel.focus();
+			});
+		} else {
 			$panel.focus();
-		});
+		}
 	}
 
 });
