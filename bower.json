@@ -1,7 +1,7 @@
 {
 	"name": "CNJS-TabSwitcher",
 	"description": "Basic TabSwitcher widget",
-	"version": "0.2.3",
+	"version": "0.2.4",
 	"main": [
 		"assets/TabSwitcher.js",
 		"assets/TabSwitcher.css"

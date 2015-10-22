@@ -3,7 +3,7 @@
 
 	DESCRIPTION: Basic TabSwitcher widget
 
-	VERSION: 0.2.3
+	VERSION: 0.2.4
 
 	USAGE: var myTabSwitcher = new TabSwitcher('Element', 'Options')
 		@param {jQuery Object}
@@ -12,7 +12,7 @@
 	AUTHOR: CN
 
 	DEPENDENCIES:
-		- jQuery 2.1.4+
+		- jQuery 2.1x+
 		- greensock
 		- Class.js
 		- HeightEqualizer.js
@@ -37,7 +37,8 @@ var TabSwitcher = Class.extend({
 			maxAutoRotations: 5,
 			animDuration: 0.2,
 			animEasing: 'Power4.easeIn',
-			customEventPrfx: 'CNJS:TabSwitcher'
+			selectorFocusEls: 'a, button, input, select, textarea',
+			customEventName: 'CNJS:TabSwitcher'
 		}, objOptions || {});
 
 		// element references
@@ -45,18 +46,18 @@ var TabSwitcher = Class.extend({
 		this.$panels = this.$el.find(this.options.selectorPanels);
 
 		// setup & properties
-		this.isAnimating = false;
-		this._len = this.$panels.length;
-		if (this.options.initialIndex >= this._len) {this.options.initialIndex = 0;}
+		this._length = this.$panels.length;
+		if (this.options.initialIndex >= this._length) {this.options.initialIndex = 0;}
 		this.currentIndex = this.options.initialIndex;
-		this.prevIndex = false;
+		this.previousIndex = null;
 		this.heightEqualizer = null;
+		this.isAnimating = false;
 
 		// check url hash to override currentIndex
 		this.focusOnInit = false;
 		this.urlHash = window.location.hash.replace('#','') || false;
 		if (this.urlHash) {
-			for (var i=0; i<this._len; i++) {
+			for (var i=0; i<this._length; i++) {
 				if (this.$panels[i].id === this.urlHash) {
 					this.currentIndex = i;
 					this.focusOnInit = true;
@@ -69,6 +70,8 @@ var TabSwitcher = Class.extend({
 
 		this.bindEvents();
 
+		$.event.trigger(this.options.customEventName + ':isInitialized', [this.$el]);
+
 	},
 
 
@@ -77,12 +80,13 @@ var TabSwitcher = Class.extend({
 **/
 
 	initDOM: function() {
-		var $activeTab = $(this.$tabs[this.currentIndex]);
-		var $activePanel = $(this.$panels[this.currentIndex]);
+		var $activeTab = this.$tabs.eq(this.currentIndex);
+		var $activePanel = this.$panels.eq(this.currentIndex);
 
 		this.$el.attr({'role':'tablist'});
-		this.$tabs.attr({'role':'tab'});
+		this.$tabs.attr({'role':'tab', 'tabindex':'0'});
 		this.$panels.attr({'role':'tabpanel', 'tabindex':'-1'});
+		this.$panels.find(this.options.selectorFocusEls).attr({'tabindex':'-1'});
 
 		// equalize items height
 		if (this.options.equalizeHeight) {
@@ -93,7 +97,8 @@ var TabSwitcher = Class.extend({
 		}
 
 		$activeTab.addClass(this.options.activeClass);
-		$activePanel.addClass(this.options.activeClass);
+		$activePanel.addClass(this.options.activeClass).attr({'tabindex':'0'});
+		$activePanel.find(this.options.selectorFocusEls).attr({'tabindex':'0'});
 
 		TweenMax.set(this.$panels, {
 			display: 'none',
@@ -108,7 +113,7 @@ var TabSwitcher = Class.extend({
 		// auto-rotate items
 		if (this.options.autoRotate) {
 			this.rotationInterval = this.options.autoRotateInterval;
-			this.autoRotationCounter = this._len * this.options.maxAutoRotations;
+			this.autoRotationCounter = this._length * this.options.maxAutoRotations;
 			this.setAutoRotation = setInterval(function() {
 				this.autoRotation();
 			}.bind(this), this.rotationInterval);
@@ -121,8 +126,6 @@ var TabSwitcher = Class.extend({
 				this.focusOnPanel($activePanel);
 			}.bind(this));
 		}
-
-		$.event.trigger(this.options.customEventPrfx + ':isInitialized', [this.$el]);
 
 	},
 
@@ -142,9 +145,9 @@ var TabSwitcher = Class.extend({
 	},
 
 	autoRotation: function() {
-		this.prevIndex = this.currentIndex;
+		this.previousIndex = this.currentIndex;
 		this.currentIndex++;
-		if (this.currentIndex === this._len) {this.currentIndex = 0;}
+		if (this.currentIndex === this._length) {this.currentIndex = 0;}
 
 		this.switchPanels();
 		this.autoRotationCounter--;
@@ -178,7 +181,7 @@ var TabSwitcher = Class.extend({
 		if (this.currentIndex === index) {
 			this.$panels[index].focus();
 		} else {
-			this.prevIndex = this.currentIndex;
+			this.previousIndex = this.currentIndex;
 			this.currentIndex = index;
 			this.switchPanels(event);
 		}
@@ -192,10 +195,10 @@ var TabSwitcher = Class.extend({
 
 	switchPanels: function(event) {
 		var self = this;
-		var $inactiveTab = $(this.$tabs[this.prevIndex]);
-		var $inactivePanel = $(this.$panels[this.prevIndex]);
-		var $activeTab = $(this.$tabs[this.currentIndex]);
-		var $activePanel = $(this.$panels[this.currentIndex]);
+		var $inactiveTab = this.$tabs.eq(this.previousIndex);
+		var $inactivePanel = this.$panels.eq(this.previousIndex);
+		var $activeTab = this.$tabs.eq(this.currentIndex);
+		var $activePanel = this.$panels.eq(this.currentIndex);
 
 		this.isAnimating = true;
 
@@ -204,8 +207,10 @@ var TabSwitcher = Class.extend({
 		$activeTab.addClass(this.options.activeClass);
 
 		//update panels
-		$inactivePanel.removeClass(this.options.activeClass);
-		$activePanel.addClass(this.options.activeClass);
+		$inactivePanel.removeClass(this.options.activeClass).attr({'tabindex':'-1'});
+		$inactivePanel.find(this.options.selectorFocusEls).attr({'tabindex':'-1'});
+		$activePanel.addClass(this.options.activeClass).attr({'tabindex':'0'});
+		$activePanel.find(this.options.selectorFocusEls).attr({'tabindex':'0'});
 
 		TweenMax.set($inactivePanel, {
 			display: 'none',
@@ -225,7 +230,7 @@ var TabSwitcher = Class.extend({
 			}
 		});
 
-		$.event.trigger(this.options.customEventPrfx + ':panelOpened', [this.currentIndex]);
+		$.event.trigger(this.options.customEventName + ':panelOpened', [this.currentIndex]);
 
 	},
 
