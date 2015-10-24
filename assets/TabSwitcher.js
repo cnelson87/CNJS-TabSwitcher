@@ -3,7 +3,7 @@
 
 	DESCRIPTION: Basic TabSwitcher widget
 
-	VERSION: 0.2.4
+	VERSION: 0.2.5
 
 	USAGE: var myTabSwitcher = new TabSwitcher('Element', 'Options')
 		@param {jQuery Object}
@@ -12,7 +12,7 @@
 	AUTHOR: CN
 
 	DEPENDENCIES:
-		- jQuery 2.1x+
+		- jquery 2.1x+
 		- greensock
 		- Class.js
 		- HeightEqualizer.js
@@ -83,9 +83,9 @@ var TabSwitcher = Class.extend({
 		var $activeTab = this.$tabs.eq(this.currentIndex);
 		var $activePanel = this.$panels.eq(this.currentIndex);
 
-		this.$el.attr({'role':'tablist'});
-		this.$tabs.attr({'role':'tab', 'tabindex':'0'});
-		this.$panels.attr({'role':'tabpanel', 'tabindex':'-1'});
+		this.$el.attr({'role':'tablist', 'aria-live':'polite'});
+		this.$tabs.attr({'role':'tab', 'tabindex':'0', 'aria-selected':'false'});
+		this.$panels.attr({'role':'tabpanel', 'tabindex':'-1', 'aria-hidden':'true'});
 		this.$panels.find(this.options.selectorFocusEls).attr({'tabindex':'-1'});
 
 		// equalize items height
@@ -96,8 +96,8 @@ var TabSwitcher = Class.extend({
 			});
 		}
 
-		$activeTab.addClass(this.options.activeClass);
-		$activePanel.addClass(this.options.activeClass).attr({'tabindex':'0'});
+		$activeTab.addClass(this.options.activeClass).attr({'aria-selected':'true'});
+		$activePanel.addClass(this.options.activeClass).attr({'tabindex':'0', 'aria-hidden':'false'});
 		$activePanel.find(this.options.selectorFocusEls).attr({'tabindex':'0'});
 
 		TweenMax.set(this.$panels, {
@@ -203,13 +203,13 @@ var TabSwitcher = Class.extend({
 		this.isAnimating = true;
 
 		//update tabs
-		$inactiveTab.removeClass(this.options.activeClass);
-		$activeTab.addClass(this.options.activeClass);
+		$inactiveTab.removeClass(this.options.activeClass).attr({'aria-selected':'false'});
+		$activeTab.addClass(this.options.activeClass).attr({'aria-selected':'true'});
 
 		//update panels
-		$inactivePanel.removeClass(this.options.activeClass).attr({'tabindex':'-1'});
+		$inactivePanel.removeClass(this.options.activeClass).attr({'tabindex':'-1', 'aria-hidden':'true'});
 		$inactivePanel.find(this.options.selectorFocusEls).attr({'tabindex':'-1'});
-		$activePanel.addClass(this.options.activeClass).attr({'tabindex':'0'});
+		$activePanel.addClass(this.options.activeClass).attr({'tabindex':'0', 'aria-hidden':'false'});
 		$activePanel.find(this.options.selectorFocusEls).attr({'tabindex':'0'});
 
 		TweenMax.set($inactivePanel, {
